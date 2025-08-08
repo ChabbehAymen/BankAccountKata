@@ -5,8 +5,6 @@ public class BankAccount
     readonly List<Transaction> transactions = [];
     readonly IDateProvider dateProvider;
 
-    int balance = 0;
-
     public BankAccount(IDateProvider dateProvider)
     {
         this.dateProvider = dateProvider ?? throw new ArgumentNullException(nameof(dateProvider));
@@ -15,24 +13,38 @@ public class BankAccount
 
     public void Deposit(int money)
     {
-        balance += money;
-        SaveTransaction(money);
+        HandleTransaction(money);
     }
 
-    private void SaveTransaction(int money)
+    private void HandleTransaction(int money)
     {
-        var transaction = new Transaction(money, dateProvider.Today, balance);
+        var transaction = CreateTransaction(money);
+        SaveTransaction(transaction);
+    }
+    private Transaction CreateTransaction(int money)
+    {
+        var newBalance = GetBalance() + money;
+        return new Transaction(money, dateProvider.Today, newBalance);
+    }
+
+    private void SaveTransaction(Transaction transaction)
+    {
         transactions.Add(transaction);
     }
 
     public void Withdraw(int money)
     {
-        balance -= money;
+        HandleTransaction(-money);
     }
 
     public int GetBalance()
     {
-        return balance;
+        return SumAmountsOfAllTransactions();
+    }
+
+    private int SumAmountsOfAllTransactions()
+    {
+        return transactions.Sum(t => t.Amount);
     }
 
     public IEnumerable<Transaction> GetTransactions()
