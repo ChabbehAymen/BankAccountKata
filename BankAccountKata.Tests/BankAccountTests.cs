@@ -44,6 +44,15 @@ public class BankAccountTests
     }
 
     [Fact]
+    public void Throws_on_negative_deposit()
+    {
+        var action = () => sut.Deposit(-1);
+
+        action.Should().Throw<ArgumentException>()
+                       .WithMessage("Negative amounts are not allowed.");
+    }
+
+    [Fact]
     public void Balance_decreases_on_withdrawal()
     {
         SetBalanceTo(2);

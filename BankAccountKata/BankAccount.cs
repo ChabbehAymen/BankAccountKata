@@ -1,4 +1,7 @@
-﻿namespace BankAccountKata;
+﻿using System.Runtime.CompilerServices;
+using System.Transactions;
+
+namespace BankAccountKata;
 
 public class BankAccount
 {
@@ -13,7 +16,14 @@ public class BankAccount
 
     public void Deposit(int money)
     {
+        EnsureIsPositive(money);
         HandleTransaction(money);
+    }
+
+    private static void EnsureIsPositive(int money)
+    {
+        if (money < 0) 
+            throw new ArgumentException("Negative amounts are not allowed.");
     }
 
     private void HandleTransaction(int money)
@@ -34,7 +44,14 @@ public class BankAccount
 
     public void Withdraw(int money)
     {
+        EnsureBalanceIsSufficient(money);
         HandleTransaction(-money);
+    }
+
+    private void EnsureBalanceIsSufficient(int money)
+    {
+        if (money > GetBalance()) 
+            throw new ArgumentException("Balance is insufficient.");
     }
 
     public int GetBalance()
