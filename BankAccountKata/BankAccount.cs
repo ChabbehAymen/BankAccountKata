@@ -44,9 +44,32 @@ public class BankAccount
 
     public void Withdraw(int money)
     {
+        EnsureNoMoreThanThreeWithdrawalsToday();
         EnsureIsPositive(money);
         EnsureBalanceIsSufficient(money);
         HandleTransaction(-money);
+    }
+
+    private void EnsureNoMoreThanThreeWithdrawalsToday()
+    {
+        var withdrawalCount = GetTodaysWithdrawalCount();
+        ThrowIfMoreThanThreeWithdrawals(withdrawalCount);
+    }
+
+    private static void ThrowIfMoreThanThreeWithdrawals(int withdrawalCount)
+    {
+        if (withdrawalCount >= 3)
+            throw new InvalidOperationException("Cannot exceed 3 withdrawals per day.");
+    }
+
+    private int GetTodaysWithdrawalCount()
+    {
+        return transactions.Count(IsTodaysWithdrawal);
+    }
+
+    private bool IsTodaysWithdrawal(Transaction transaction)
+    {
+        return transaction.Amount < 0 && transaction.Date.Equals(dateProvider.Today);
     }
 
     private void EnsureBalanceIsSufficient(int money)

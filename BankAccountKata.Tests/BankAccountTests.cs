@@ -87,7 +87,7 @@ public class BankAccountTests
     [Fact]
     public void Tracks_deposit_transactions()
     {
-        GivenTodayIs(new(2015, 7, 1));
+        GivenTodayIs(2015, 7, 1);
 
         sut.Deposit(1);
 
@@ -95,15 +95,15 @@ public class BankAccountTests
         sut.GetTransactions().Single().Should().Be(expected);
     }
 
-    private void GivenTodayIs(DateOnly date)
+    private void GivenTodayIs(int year, int month, int day)
     {
-        ((DateProvider)dateProvider).Today = date;
+        ((DateProvider)dateProvider).Today = new DateOnly(year, month, day);
     }
 
     [Fact]
     public void Tracks_withdrawals_transactions()
     {
-        GivenTodayIs(new(2015, 7, 1));
+        GivenTodayIs(2015, 7, 1);
         sut.Deposit(1);
 
         sut.Withdraw(1);
@@ -130,6 +130,41 @@ public class BankAccountTests
 
         action.Should().Throw<ArgumentException>()
                        .WithMessage("Negative amounts are not allowed.");
+    }
+
+    [Fact]
+    public void Does_not_track_failed_withdrawal()
+    {
+        try
+        {
+            sut.Withdraw(-1);
+            Assert.Fail("Withdrawal should have failed.");
+        }
+        catch
+        {
+            sut.GetTransactions().Should().BeEmpty();
+        }
+    }
+
+
+    [Fact]
+    public void Accepts_only_three_withdrawals_a_day()
+    {
+        GivenTodayIs(2015, 7, 1);
+        MakeThreeWithdrawals();
+
+        var actions = () => sut.Withdraw(1);
+
+        actions.Should().Throw<InvalidOperationException>()
+                        .WithMessage("Cannot exceed 3 withdrawals per day.");
+    }
+
+    private void MakeThreeWithdrawals()
+    {
+        SetBalanceTo(5);
+        sut.Withdraw(1);
+        sut.Withdraw(1);
+        sut.Withdraw(1);
     }
 
 }
