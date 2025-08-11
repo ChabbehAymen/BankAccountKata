@@ -53,6 +53,20 @@ public class BankAccountTests
     }
 
     [Fact]
+    public void Does_not_track_failed_deposit()
+    {
+        try
+        {
+            sut.Deposit(-1);
+            Assert.Fail("Deposit should have failed.");
+        }
+        catch
+        {
+            sut.GetTransactions().Should().BeEmpty();
+        }
+    }
+
+    [Fact]
     public void Balance_decreases_on_withdrawal()
     {
         SetBalanceTo(2);
