@@ -34,7 +34,10 @@ public class BankAccountTests
 
     void SetBalanceTo(int money)
     {
-        sut = CreateSut();
+        if (sut.GetBalance() > money)
+        {
+            sut.Withdraw(money - sut.GetBalance());
+        }
         sut.Deposit(money);
     }
 
@@ -167,6 +170,17 @@ public class BankAccountTests
         sut.Withdraw(1);
     }
 
+    [Fact]
+    public void Resets_threshold_of_withdrawal_count_on_new_day()
+    {
+        GivenTodayIs(2015, 7, 1);
+        MakeThreeWithdrawals();
+        GivenTodayIs(2015, 7, 2);
+       
+        var action = () => MakeThreeWithdrawals();
+
+        action.Should().NotThrow();
+    }
 }
 
 file class DateProvider : IDateProvider
