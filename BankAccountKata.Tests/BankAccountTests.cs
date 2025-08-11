@@ -108,6 +108,16 @@ public class BankAccountTests
         action.Should().Throw<ArgumentException>()
                        .WithMessage("Balance is insufficient.");
     }
+
+    [Fact]
+    public void Throws_on_negative_withdrawal()
+    {
+        var action = () => sut.Withdraw(-1);
+
+        action.Should().Throw<ArgumentException>()
+                       .WithMessage("Negative amounts are not allowed.");
+    }
+
 }
 
 file class DateProvider : IDateProvider

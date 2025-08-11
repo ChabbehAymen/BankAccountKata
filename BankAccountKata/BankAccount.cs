@@ -44,6 +44,7 @@ public class BankAccount
 
     public void Withdraw(int money)
     {
+        EnsureIsPositive(money);
         EnsureBalanceIsSufficient(money);
         HandleTransaction(-money);
     }
