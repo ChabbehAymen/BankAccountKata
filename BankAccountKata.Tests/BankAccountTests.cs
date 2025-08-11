@@ -25,20 +25,16 @@ public class BankAccountTests
     [Fact]
     public void Balance_increases_on_deposit()
     {
-        SetBalanceTo(0);
+        GivenBalanceIsZero();
 
         sut.Deposit(1);
 
         sut.GetBalance().Should().Be(1);
     }
 
-    void SetBalanceTo(int money)
+    void GivenBalanceIsZero()
     {
-        if (sut.GetBalance() > money)
-        {
-            sut.Withdraw(money - sut.GetBalance());
-        }
-        sut.Deposit(money);
+        sut.GetBalance().Should().Be(0);
     }
 
     private BankAccount CreateSut()
@@ -72,11 +68,16 @@ public class BankAccountTests
     [Fact]
     public void Balance_decreases_on_withdrawal()
     {
-        SetBalanceTo(2);
+        AddMoneyToBalance(2);
 
         sut.Withdraw(1);
 
         sut.GetBalance().Should().Be(1);
+    }
+
+    private void AddMoneyToBalance(int money)
+    {
+        sut.Deposit(money);
     }
 
     [Fact]
@@ -118,7 +119,7 @@ public class BankAccountTests
     [Fact]
     public void Throws_when_withdrawing_more_than_balance() 
     {
-        SetBalanceTo(1);
+        AddMoneyToBalance(1);
 
         var action = () => sut.Withdraw(2);
 
@@ -164,7 +165,7 @@ public class BankAccountTests
 
     private void MakeThreeWithdrawals()
     {
-        SetBalanceTo(5);
+        AddMoneyToBalance(5);
         sut.Withdraw(1);
         sut.Withdraw(1);
         sut.Withdraw(1);
