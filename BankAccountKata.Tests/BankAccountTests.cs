@@ -76,6 +76,29 @@ public class BankAccountTests
     {
         ((DateProvider)dateProvider).Today = date;
     }
+
+    [Fact]
+    public void Tracks_withdrawals_transactions()
+    {
+        GivenTodayIs(new(2015, 7, 1));
+        sut.Deposit(1);
+
+        sut.Withdraw(1);
+
+        var expected = new Transaction(Amount: -1, Date: new(2015, 7, 1), Balance: 0);
+        sut.GetTransactions().Last().Should().Be(expected);
+    }
+
+    [Fact]
+    public void Throws_when_withdrawing_more_than_balance() 
+    {
+        SetBalanceTo(1);
+
+        var action = () => sut.Withdraw(2);
+
+        action.Should().Throw<ArgumentException>()
+                       .WithMessage("Balance is insufficient.");
+    }
 }
 
 file class DateProvider : IDateProvider
