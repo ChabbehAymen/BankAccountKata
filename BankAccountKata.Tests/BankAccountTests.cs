@@ -207,6 +207,17 @@ public class BankAccountTests
 
         action.Should().NotThrow();
     }
+
+    [Fact]
+    public void Prioritizes_non_negative_amount_rule_over_withdrawal_count_threshold_rule()
+    {
+        MakeThreeWithdrawals();
+
+        var action = () => sut.Withdraw(-1);
+
+        action.Should().Throw<ArgumentException>()
+                       .WithMessage("Negative amounts are not allowed.");
+    }
 }
 
 file class DateProvider : IDateProvider
