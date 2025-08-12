@@ -1,7 +1,4 @@
-﻿using System.Runtime.CompilerServices;
-using System.Transactions;
-
-namespace BankAccountKata;
+﻿namespace BankAccountKata;
 
 public class BankAccount
 {
@@ -69,11 +66,11 @@ public class BankAccount
 
     private void EnsureMaximumDailyWithdrawalAmountIsNotExceeded(int requestedAmount)
     {
-        var candidateTodaysAmount = GetTodaysWithdrawalAmountIncluding(requestedAmount);
-        ThrowIfDailyWithdrawalThresholdIsExceeded(candidateTodaysAmount);
+        var candidateTotalAmount = AddRequestedAmountToAmountWithdrewToday(requestedAmount);
+        ThrowIfDailyWithdrawalThresholdIsExceeded(candidateTotalAmount);
     }
 
-    private int GetTodaysWithdrawalAmountIncluding(int requestedAmount)
+    private int AddRequestedAmountToAmountWithdrewToday(int requestedAmount)
     {
         var todaysAmount = GetAmountWithdrewToday();
         var candidateTodaysAmount = todaysAmount + requestedAmount;
@@ -89,7 +86,7 @@ public class BankAccount
 
     private int GetAmountWithdrewToday()
     {
-        var todaysNegativeWithdrawalSum = transactions.Where(IsTodaysWithdrawal).Sum(x => x.Amount);
+        var todaysNegativeWithdrawalSum = transactions.Where(IsWithdrewToday).Sum(t => t.Amount);
         var todaysPositiveWithdrawalAmount = Math.Abs(todaysNegativeWithdrawalSum);
 
         return todaysPositiveWithdrawalAmount;
@@ -101,6 +98,11 @@ public class BankAccount
         ThrowIfDailyWithdrawalCountThresholdIsExceeded(todaysWithdrawalCount);
     }
 
+    private int GetTodaysWithdrawalCount()
+    {
+        return transactions.Count(IsWithdrewToday);
+    }
+
     private static void ThrowIfDailyWithdrawalCountThresholdIsExceeded(int todaysWithdrawalCount)
     {
         const int MaximumDailyWithdrawalCount = 3;
@@ -108,12 +110,7 @@ public class BankAccount
             throw new InvalidOperationException($"Cannot exceed {MaximumDailyWithdrawalCount} withdrawals per day.");
     }
 
-    private int GetTodaysWithdrawalCount()
-    {
-        return transactions.Count(IsTodaysWithdrawal);
-    }
-
-    private bool IsTodaysWithdrawal(Transaction transaction)
+    private bool IsWithdrewToday(Transaction transaction)
     {
         return transaction.Amount < 0 && transaction.Date.Equals(dateProvider.Today);
     }

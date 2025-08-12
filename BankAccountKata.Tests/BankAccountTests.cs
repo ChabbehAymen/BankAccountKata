@@ -15,7 +15,7 @@ public class BankAccountTests
     }
 
     [Fact]
-    public void Balance_is_zero_on_creation() 
+    public void Balance_is_zero_on_creation()
     {
         var sut = CreateSut();
 
@@ -81,7 +81,7 @@ public class BankAccountTests
     }
 
     [Fact]
-    public void Transactions_are_empty_on_creation() 
+    public void No_transactions_exist_on_creation()
     {
         var sut = CreateSut();
 
@@ -108,7 +108,7 @@ public class BankAccountTests
     public void Tracks_withdrawals_transactions()
     {
         GivenTodayIs(2015, 7, 1);
-        sut.Deposit(1);
+        AddMoneyToBalance(1);
 
         sut.Withdraw(1);
 
@@ -117,7 +117,7 @@ public class BankAccountTests
     }
 
     [Fact]
-    public void Throws_when_withdrawing_more_than_balance() 
+    public void Throws_when_withdrawing_more_than_balance()
     {
         AddMoneyToBalance(1);
 
@@ -150,7 +150,6 @@ public class BankAccountTests
         }
     }
 
-
     [Fact]
     public void Accepts_only_three_withdrawals_a_day()
     {
@@ -177,7 +176,7 @@ public class BankAccountTests
         GivenTodayIs(2015, 7, 1);
         MakeThreeWithdrawals();
         GivenTodayIs(2015, 7, 2);
-       
+
         var action = () => MakeThreeWithdrawals();
 
         action.Should().NotThrow();
