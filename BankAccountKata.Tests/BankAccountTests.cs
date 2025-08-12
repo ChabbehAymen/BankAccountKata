@@ -194,6 +194,19 @@ public class BankAccountTests
         action.Should().Throw<InvalidOperationException>()
                         .WithMessage("Cannot withdraw more than 100 per day.");
     }
+
+    [Fact]
+    public void Resets_threshold_of_withdrawal_amount_on_new_day()
+    {
+        GivenTodayIs(2015, 7, 1);
+        AddMoneyToBalance(200);
+        sut.Withdraw(100);
+        GivenTodayIs(2015, 7, 2);
+
+        var action = () => sut.Withdraw(100);
+
+        action.Should().NotThrow();
+    }
 }
 
 file class DateProvider : IDateProvider
