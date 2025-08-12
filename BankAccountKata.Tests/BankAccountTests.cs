@@ -157,9 +157,9 @@ public class BankAccountTests
         GivenTodayIs(2015, 7, 1);
         MakeThreeWithdrawals();
 
-        var actions = () => sut.Withdraw(1);
+        var action = () => sut.Withdraw(1);
 
-        actions.Should().Throw<InvalidOperationException>()
+        action.Should().Throw<InvalidOperationException>()
                         .WithMessage("Cannot exceed 3 withdrawals per day.");
     }
 
@@ -181,6 +181,19 @@ public class BankAccountTests
         var action = () => MakeThreeWithdrawals();
 
         action.Should().NotThrow();
+    }
+
+    [Fact]
+    public void Accepts_total_withdrawal_amount_of_100_a_day()
+    {
+        GivenTodayIs(2015, 7, 1);
+        AddMoneyToBalance(200);
+        sut.Withdraw(100);
+
+        var action = () => sut.Withdraw(1);
+
+        action.Should().Throw<InvalidOperationException>()
+                        .WithMessage("Cannot withdraw more than 100 per day.");
     }
 }
 

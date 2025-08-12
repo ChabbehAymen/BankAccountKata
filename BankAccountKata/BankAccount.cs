@@ -22,7 +22,7 @@ public class BankAccount
 
     private static void EnsureIsPositive(int money)
     {
-        if (money < 0) 
+        if (money < 0)
             throw new ArgumentException("Negative amounts are not allowed.");
     }
 
@@ -44,22 +44,68 @@ public class BankAccount
 
     public void Withdraw(int money)
     {
-        EnsureNoMoreThanThreeWithdrawalsToday();
-        EnsureIsPositive(money);
-        EnsureBalanceIsSufficient(money);
+        EnsureWithdrawalRulesAreSatisfied(money);
+
         HandleTransaction(-money);
     }
 
-    private void EnsureNoMoreThanThreeWithdrawalsToday()
+    private void EnsureWithdrawalRulesAreSatisfied(int money)
     {
-        var withdrawalCount = GetTodaysWithdrawalCount();
-        ThrowIfMoreThanThreeWithdrawals(withdrawalCount);
+        EnsureIsPositive(money);
+        EnsureWithdrawalThresholdsAreNotExceeded(money);
+        EnsureBalanceIsSufficient(money);
     }
 
-    private static void ThrowIfMoreThanThreeWithdrawals(int withdrawalCount)
+    private void EnsureWithdrawalThresholdsAreNotExceeded(int money)
     {
-        if (withdrawalCount >= 3)
-            throw new InvalidOperationException("Cannot exceed 3 withdrawals per day.");
+        EnsureDailyWithdrawalThresholdsAreNotExceeded(money);
+    }
+
+    private void EnsureDailyWithdrawalThresholdsAreNotExceeded(int money)
+    {
+        EnsureMaximumDailyWithdrawalAmountIsNotExceeded(money);
+        EnsureMaximumDailyWithdrawalCountIsNotExceeded();
+    }
+
+    private void EnsureMaximumDailyWithdrawalAmountIsNotExceeded(int requestedAmount)
+    {
+        var candidateTodaysAmount = GetTodaysWithdrawalAmountIncluding(requestedAmount);
+        ThrowIfDailyWithdrawalThresholdIsExceeded(candidateTodaysAmount);
+    }
+
+    private int GetTodaysWithdrawalAmountIncluding(int requestedAmount)
+    {
+        var todaysAmount = GetAmountWithdrewToday();
+        var candidateTodaysAmount = todaysAmount + requestedAmount;
+        return candidateTodaysAmount;
+    }
+
+    private static void ThrowIfDailyWithdrawalThresholdIsExceeded(int candidateTodaysAmount)
+    {
+        const int MaximumDailyWithdrawalAmount = 100;
+        if (candidateTodaysAmount > MaximumDailyWithdrawalAmount)
+            throw new InvalidOperationException($"Cannot withdraw more than {MaximumDailyWithdrawalAmount} per day.");
+    }
+
+    private int GetAmountWithdrewToday()
+    {
+        var todaysNegativeWithdrawalSum = transactions.Where(IsTodaysWithdrawal).Sum(x => x.Amount);
+        var todaysPositiveWithdrawalAmount = Math.Abs(todaysNegativeWithdrawalSum);
+
+        return todaysPositiveWithdrawalAmount;
+    }
+
+    private void EnsureMaximumDailyWithdrawalCountIsNotExceeded()
+    {
+        var todaysWithdrawalCount = GetTodaysWithdrawalCount();
+        ThrowIfDailyWithdrawalCountThresholdIsExceeded(todaysWithdrawalCount);
+    }
+
+    private static void ThrowIfDailyWithdrawalCountThresholdIsExceeded(int todaysWithdrawalCount)
+    {
+        const int MaximumDailyWithdrawalCount = 3;
+        if (todaysWithdrawalCount == MaximumDailyWithdrawalCount)
+            throw new InvalidOperationException($"Cannot exceed {MaximumDailyWithdrawalCount} withdrawals per day.");
     }
 
     private int GetTodaysWithdrawalCount()
@@ -74,7 +120,7 @@ public class BankAccount
 
     private void EnsureBalanceIsSufficient(int money)
     {
-        if (money > GetBalance()) 
+        if (money > GetBalance())
             throw new ArgumentException("Balance is insufficient.");
     }
 
