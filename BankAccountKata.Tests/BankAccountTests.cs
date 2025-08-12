@@ -241,6 +241,16 @@ public class BankAccountTests
 
         action.Should().Throw<ArgumentException>().WithMessage("Balance is insufficient.");
     }
+
+    [Fact]
+    public void Prioritizes_balance_incefisent_rule_over_withdrawal_count_threshold_rule()
+    {
+        MakeThreeWithdrawals();
+
+        var action = () => sut.Withdraw(3);
+
+        action.Should().Throw<ArgumentException>().WithMessage("Balance is insufficient.");
+    }
 }
 
 file class DateProvider : IDateProvider
