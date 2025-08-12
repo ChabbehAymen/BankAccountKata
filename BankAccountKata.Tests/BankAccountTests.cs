@@ -251,6 +251,19 @@ public class BankAccountTests
 
         action.Should().Throw<ArgumentException>().WithMessage("Balance is insufficient.");
     }
+    [Fact]
+    public void Prioritizes_withdrawal_amount_threshold_rule_over_withdrawal_count_threshold_rule()
+    {
+        AddMoneyToBalance(200);
+        sut.Withdraw(40);
+        sut.Withdraw(40);
+        sut.Withdraw(20);
+
+        var action = () => sut.Withdraw(1);
+
+        action.Should().Throw<InvalidOperationException>()
+                        .WithMessage("Cannot withdraw more than 100 per day.");
+    }
 }
 
 file class DateProvider : IDateProvider
