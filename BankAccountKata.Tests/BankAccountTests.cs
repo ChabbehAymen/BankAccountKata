@@ -132,8 +132,10 @@ public class BankAccountTests
     {
         var action = () => sut.Withdraw(-1);
 
+        // Assert
         action.Should().Throw<ArgumentException>()
                        .WithMessage("Negative amounts are not allowed.");
+        sut.GetBalance().Should().Be(0);
     }
 
     [Fact]
@@ -217,6 +219,27 @@ public class BankAccountTests
 
         action.Should().Throw<ArgumentException>()
                        .WithMessage("Negative amounts are not allowed.");
+    }
+
+    [Fact]
+    public void Prioritizes_non_negative_amount_rule_over_withdrawal_amount_threshold_rule()
+    {
+        // We might think that this fact should be verified, 
+        // but it's already covered by a more general fact
+        // that ensures a negative amount is rejected right away
+        // in all kinds of situations.
+        // We opted for keeping this fact to prevent
+        // unnecessary confusion again.
+    }
+
+    [Fact]
+    public void Prioritizes_balance_incefisent_rule_over_withdrawal_amount_threshold_rule()
+    {
+        AddMoneyToBalance(90);
+
+        var action = () => sut.Withdraw(110);
+
+        action.Should().Throw<ArgumentException>().WithMessage("Balance is insufficient.");
     }
 }
 

@@ -49,8 +49,9 @@ public class BankAccount
     private void EnsureWithdrawalRulesAreSatisfied(int money)
     {
         EnsureIsPositive(money);
-        EnsureWithdrawalThresholdsAreNotExceeded(money);
+
         EnsureBalanceIsSufficient(money);
+        EnsureWithdrawalThresholdsAreNotExceeded(money);
     }
 
     private void EnsureWithdrawalThresholdsAreNotExceeded(int money)
