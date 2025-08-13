@@ -251,6 +251,7 @@ public class BankAccountTests
 
         action.Should().Throw<ArgumentException>().WithMessage("Balance is insufficient.");
     }
+
     [Fact]
     public void Prioritizes_withdrawal_amount_threshold_rule_over_withdrawal_count_threshold_rule()
     {

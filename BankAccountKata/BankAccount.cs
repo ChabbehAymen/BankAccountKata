@@ -61,8 +61,8 @@ public class BankAccount
 
     private void EnsureDailyWithdrawalThresholdsAreNotExceeded(int money)
     {
-        EnsureMaximumDailyWithdrawalCountIsNotExceeded();
         EnsureMaximumDailyWithdrawalAmountIsNotExceeded(money);
+        EnsureMaximumDailyWithdrawalCountIsNotExceeded();
     }
 
     private void EnsureMaximumDailyWithdrawalAmountIsNotExceeded(int requestedAmount)
