@@ -233,7 +233,7 @@ public class BankAccountTests
     }
 
     [Fact]
-    public void Prioritizes_balance_incefisent_rule_over_withdrawal_amount_threshold_rule()
+    public void Prioritizes_balance_insufficient_rule_over_withdrawal_amount_threshold_rule()
     {
         AddMoneyToBalance(90);
 
@@ -243,7 +243,7 @@ public class BankAccountTests
     }
 
     [Fact]
-    public void Prioritizes_balance_incefisent_rule_over_withdrawal_count_threshold_rule()
+    public void Prioritizes_balance_insufficient_rule_over_withdrawal_count_threshold_rule()
     {
         MakeThreeWithdrawals();
 
