@@ -166,10 +166,7 @@ public class BankAccountTests
 
     private void MakeThreeWithdrawals()
     {
-        AddMoneyToBalance(5);
-        sut.Withdraw(1);
-        sut.Withdraw(1);
-        sut.Withdraw(1);
+        MakeWithdrawalsOf([1, 1, 1], 5);
     }
 
     [Fact]
@@ -235,30 +232,42 @@ public class BankAccountTests
     [Fact]
     public void Prioritizes_balance_insufficient_rule_over_withdrawal_amount_threshold_rule()
     {
-        AddMoneyToBalance(90);
+        AddMoneyToBalance(1);
 
-        var action = () => sut.Withdraw(110);
+        var action = () => WithdrawMoreThanBalanceAndMoreThanAmountThreshold();
 
         action.Should().Throw<ArgumentException>().WithMessage("Balance is insufficient.");
+    }
+
+    private void WithdrawMoreThanBalanceAndMoreThanAmountThreshold()
+    {
+        sut.Withdraw(100 + 1);
     }
 
     [Fact]
     public void Prioritizes_balance_insufficient_rule_over_withdrawal_count_threshold_rule()
     {
-        MakeThreeWithdrawals();
+        MakeWithdrawalsOf([1, 1, 1], initialDeposit: 3);
 
-        var action = () => sut.Withdraw(3);
+        var action = () => sut.Withdraw(1);
 
         action.Should().Throw<ArgumentException>().WithMessage("Balance is insufficient.");
+    }
+
+    private void MakeWithdrawalsOf(IEnumerable<int> amounts, int initialDeposit = 0)
+    {
+        AddMoneyToBalance(initialDeposit);
+
+        foreach (var amount in amounts)
+        {
+            sut.Withdraw(amount);
+        }
     }
 
     [Fact]
     public void Prioritizes_withdrawal_amount_threshold_rule_over_withdrawal_count_threshold_rule()
     {
-        AddMoneyToBalance(200);
-        sut.Withdraw(40);
-        sut.Withdraw(40);
-        sut.Withdraw(20);
+        MakeWithdrawalsOf([40, 40, 20], initialDeposit: 200);
 
         var action = () => sut.Withdraw(1);
 
