@@ -134,7 +134,41 @@ public class BankAccount
 
     public IEnumerable<Transaction> GetTransactions()
     {
+        var MaximumRegularTransactions = 50;
+        if (transactions.Count > MaximumRegularTransactions)
+        {
+            return GetTransactionsWithArchive(MaximumRegularTransactions);
+        }
         return transactions;
+    }
+
+    private List<Transaction> GetTransactionsWithArchive(int MaximumRegularTransactions)
+    {
+        var archivedTransaction = CreateArchivedTransaction(MaximumRegularTransactions);
+
+        return AddArchiveToRegularTransactions(MaximumRegularTransactions, archivedTransaction);
+    }
+
+    private Transaction CreateArchivedTransaction(int maximumRegularTransactions)
+    {
+        var archivedTransaction = transactions.Take(transactions.Count - maximumRegularTransactions).ToList();
+        var newTransaction = new Transaction(
+            archivedTransaction.Sum(t => t.Amount),
+            archivedTransaction.Last().Date,
+            archivedTransaction.Last().Balance);
+
+        return newTransaction;
+    }
+
+    private List<Transaction> AddArchiveToRegularTransactions(int MaximumRegularTransactions, Transaction newTransaction)
+    {
+        var newTransactions = new List<Transaction>
+            {
+                newTransaction
+            };
+        newTransactions.AddRange(transactions.Skip(transactions.Count - MaximumRegularTransactions));
+
+        return newTransactions;
     }
 
 }

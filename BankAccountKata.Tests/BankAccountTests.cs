@@ -275,7 +275,6 @@ public class BankAccountTests
                         .WithMessage("Cannot withdraw more than 100 per day.");
     }
 
-
     [Fact]
     public void Does_not_archive_transactions_when_less_than_or_equal_50()
     {
@@ -300,6 +299,22 @@ public class BankAccountTests
         transactions.Should().AllSatisfy(t => t.Amount.Should().Be(1));
     }
 
+    [Fact]
+    public void Archives_transactions_when_more_than_50()
+    {
+        MakeDeposits(count: 100, amount: 1);
+
+        var transactions = sut.GetTransactions();
+
+        AssertFiftyDepositsAndOneArchivedTransaction(transactions);
+    }
+
+    private void AssertFiftyDepositsAndOneArchivedTransaction(IEnumerable<Transaction> transactions)
+    {
+        transactions.Should().HaveCount(51);
+        transactions.Should().Contain(t => t.Amount == 50);
+
+    }
 }
 
 file class DateProviderStub : IDateProvider
