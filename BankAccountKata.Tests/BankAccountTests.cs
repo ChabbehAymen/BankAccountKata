@@ -10,7 +10,7 @@ public class BankAccountTests
 
     public BankAccountTests()
     {
-        dateProvider = new DateProvider();
+        dateProvider = new DateProviderStub();
         sut = CreateSut();
     }
 
@@ -101,7 +101,7 @@ public class BankAccountTests
 
     private void GivenTodayIs(int year, int month, int day)
     {
-        ((DateProvider)dateProvider).Today = new DateOnly(year, month, day);
+        ((DateProviderStub)dateProvider).Today = new DateOnly(year, month, day);
     }
 
     [Fact]
@@ -302,7 +302,7 @@ public class BankAccountTests
 
 }
 
-file class DateProvider : IDateProvider
+file class DateProviderStub : IDateProvider
 {
     public DateOnly Today { get; set; } = new();
 }
