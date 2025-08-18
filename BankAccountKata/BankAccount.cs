@@ -160,15 +160,15 @@ public class BankAccount
         return newTransaction;
     }
 
-    private List<Transaction> AddArchiveToRegularTransactions(int MaximumRegularTransactions, Transaction newTransaction)
+    private List<Transaction> AddArchiveToRegularTransactions(int MaximumRegularTransactions, Transaction archiveTransaction)
     {
-        var newTransactions = new List<Transaction>
+        var transactionsWithArchive = new List<Transaction>
             {
-                newTransaction
+                archiveTransaction
             };
-        newTransactions.AddRange(transactions.Skip(transactions.Count - MaximumRegularTransactions));
+        transactionsWithArchive.AddRange(transactions.Skip(transactions.Count - MaximumRegularTransactions));
 
-        return newTransactions;
+        return transactionsWithArchive.OrderBy(t => t.Date).ToList();
     }
 
 }

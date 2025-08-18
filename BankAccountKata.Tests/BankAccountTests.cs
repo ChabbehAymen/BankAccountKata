@@ -7,6 +7,7 @@ public class BankAccountTests
 {
     BankAccount sut;
     IDateProvider dateProvider;
+    private object transaction;
 
     public BankAccountTests()
     {
@@ -287,6 +288,8 @@ public class BankAccountTests
 
     private void MakeDeposits(int count, int amount)
     {
+        GivenTodayIs(2025, 8, 18);
+
         for (int i = 0; i < count; i++)
         {
             sut.Deposit(amount);
@@ -314,6 +317,16 @@ public class BankAccountTests
         transactions.Should().HaveCount(51);
         transactions.Should().Contain(t => t.Amount == 50);
 
+    }
+
+    [Fact]
+    public void Transactions_are_ordred_by_date_ascendant()
+    {
+        MakeDeposits(count: 100, amount: 1);
+
+        var transaction = sut.GetTransactions().First();
+
+        transaction.Amount.Should().Be(50);
     }
 }
 
