@@ -341,6 +341,19 @@ public class BankAccountTests
 
         firstTransaction.Amount.Should().Be(1);
     }
+
+    [Fact]
+    public void Aggregated_transaction_comes_before_regular_transactions()
+    {
+        MakeDeposits(count: 60, amount: 1);
+
+        var transaction = sut.GetTransactions().First();
+
+        var ExpectedAmountOfAggregatedTransactions = 10;
+        transaction.Amount.Should().Be(ExpectedAmountOfAggregatedTransactions);
+
+    }
+
 }
 
 file class DateProviderStub : IDateProvider
