@@ -330,6 +330,17 @@ public class BankAccountTests
         transactions.Should().Contain(t => t.Amount == ExpectedAmountOfAggregatedTransactions);
     }
 
+
+    [Fact]
+    public void Transactions_are_ordered_chronologically()
+    {
+        sut.Deposit(1);
+        sut.Withdraw(1);
+        
+        var firstTransaction = sut.GetTransactions().First();
+
+        firstTransaction.Amount.Should().Be(1);
+    }
 }
 
 file class DateProviderStub : IDateProvider
