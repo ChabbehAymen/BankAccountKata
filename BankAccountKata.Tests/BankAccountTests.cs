@@ -277,23 +277,26 @@ public class BankAccountTests
     }
 
     [Fact]
-    public void Does_not_archive_transactions_when_less_than_or_equal_50()
+    public void Does_not_aggregate_transactions_when_less_than_or_equal_50()
     {
         MakeDeposits(count: 50, amount: 1);
 
         var transactions = sut.GetTransactions();
 
-        AssertFiftyDepositsOfAmountOfOneEach(transactions);
+        AssertNoTransactionsWereAggregated(transactions);
     }
 
     private void MakeDeposits(int count, int amount)
     {
-        GivenTodayIs(2025, 8, 18);
-
         for (int i = 0; i < count; i++)
         {
             sut.Deposit(amount);
         }
+    }
+
+    private void AssertNoTransactionsWereAggregated(IEnumerable<Transaction> transactions)
+    {
+        AssertFiftyDepositsOfAmountOfOneEach(transactions);
     }
 
     private void AssertFiftyDepositsOfAmountOfOneEach(IEnumerable<Transaction> transactions)
@@ -303,31 +306,30 @@ public class BankAccountTests
     }
 
     [Fact]
-    public void Archives_transactions_when_more_than_50()
+    public void Aggregates_transactions_done_before_last_50()
     {
-        MakeDeposits(count: 100, amount: 1);
+        MakeDeposits(count: 60, amount: 1);
 
         var transactions = sut.GetTransactions();
 
-        AssertFiftyDepositsAndOneArchivedTransaction(transactions);
+        AssertTransactionsBeforeLastFiftyWereAggregated(transactions);
     }
 
-    private void AssertFiftyDepositsAndOneArchivedTransaction(IEnumerable<Transaction> transactions)
+    private void AssertTransactionsBeforeLastFiftyWereAggregated(IEnumerable<Transaction> transactions)
     {
-        transactions.Should().HaveCount(51);
-        transactions.Should().Contain(t => t.Amount == 50);
-
+        AssertOneAggregatedTransactionAndFiftyRegularOnes(transactions);
     }
 
-    [Fact]
-    public void Transactions_are_ordred_by_date_ascendant()
+    private void AssertOneAggregatedTransactionAndFiftyRegularOnes(IEnumerable<Transaction> transactions)
     {
-        MakeDeposits(count: 100, amount: 1);
 
-        var transaction = sut.GetTransactions().First();
+        const int ExpectedTransactionCountAfterAggregation = 50 + 1;
+        transactions.Should().HaveCount(ExpectedTransactionCountAfterAggregation);
 
-        transaction.Amount.Should().Be(50);
+        const int ExpectedAmountOfAggregatedTransactions = 10;
+        transactions.Should().Contain(t => t.Amount == ExpectedAmountOfAggregatedTransactions);
     }
+
 }
 
 file class DateProviderStub : IDateProvider

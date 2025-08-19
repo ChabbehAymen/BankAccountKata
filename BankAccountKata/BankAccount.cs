@@ -2,8 +2,9 @@
 
 public class BankAccount
 {
-    readonly List<Transaction> transactions = [];
     readonly IDateProvider dateProvider;
+    readonly Transactions transactions = new();
+
 
     public BankAccount(IDateProvider dateProvider)
     {
@@ -134,41 +135,7 @@ public class BankAccount
 
     public IEnumerable<Transaction> GetTransactions()
     {
-        var MaximumRegularTransactions = 50;
-        if (transactions.Count > MaximumRegularTransactions)
-        {
-            return GetTransactionsWithArchive(MaximumRegularTransactions);
-        }
         return transactions;
-    }
-
-    private List<Transaction> GetTransactionsWithArchive(int MaximumRegularTransactions)
-    {
-        var archivedTransaction = CreateArchivedTransaction(MaximumRegularTransactions);
-
-        return AddArchiveToRegularTransactions(MaximumRegularTransactions, archivedTransaction);
-    }
-
-    private Transaction CreateArchivedTransaction(int maximumRegularTransactions)
-    {
-        var archivedTransaction = transactions.Take(transactions.Count - maximumRegularTransactions).ToList();
-        var newTransaction = new Transaction(
-            archivedTransaction.Sum(t => t.Amount),
-            archivedTransaction.Last().Date,
-            archivedTransaction.Last().Balance);
-
-        return newTransaction;
-    }
-
-    private List<Transaction> AddArchiveToRegularTransactions(int MaximumRegularTransactions, Transaction archiveTransaction)
-    {
-        var transactionsWithArchive = new List<Transaction>
-            {
-                archiveTransaction
-            };
-        transactionsWithArchive.AddRange(transactions.Skip(transactions.Count - MaximumRegularTransactions));
-
-        return transactionsWithArchive.OrderBy(t => t.Date).ToList();
     }
 
 }
