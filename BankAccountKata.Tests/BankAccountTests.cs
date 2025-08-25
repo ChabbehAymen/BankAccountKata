@@ -53,6 +53,16 @@ public class BankAccountTests
     }
 
     [Fact]
+    public void Ignores_operations_of_amount_of_zero()
+    {
+        sut.Deposit(0);
+        sut.Withdraw(0);
+
+        sut.GetTransactions().Should().BeEmpty();
+    }
+
+
+    [Fact]
     public void Does_not_track_failed_deposit()
     {
         try
@@ -330,16 +340,15 @@ public class BankAccountTests
         transactions.Should().Contain(t => t.Amount == ExpectedAmountOfAggregatedTransactions);
     }
 
-
     [Fact]
     public void Transactions_are_ordered_chronologically()
     {
-        sut.Deposit(1);
+        sut.Deposit(2);
         sut.Withdraw(1);
         
         var firstTransaction = sut.GetTransactions().First();
 
-        firstTransaction.Amount.Should().Be(1);
+        firstTransaction.Amount.Should().Be(2);
     }
 
     [Fact]
@@ -347,10 +356,10 @@ public class BankAccountTests
     {
         MakeDeposits(count: 60, amount: 1);
 
-        var transaction = sut.GetTransactions().First();
+        var firstTransaction = sut.GetTransactions().First();
 
         var ExpectedAmountOfAggregatedTransactions = 10;
-        transaction.Amount.Should().Be(ExpectedAmountOfAggregatedTransactions);
+        firstTransaction.Amount.Should().Be(ExpectedAmountOfAggregatedTransactions);
 
     }
 

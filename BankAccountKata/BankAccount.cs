@@ -15,7 +15,15 @@ public class BankAccount
     public void Deposit(int money)
     {
         EnsureIsPositive(money);
-        HandleTransaction(money);
+        if (IsNotZero(money)) 
+        {
+            HandleTransaction(money);
+        }
+    }
+
+    private bool IsNotZero(int money)
+    {
+        return money != 0;
     }
 
     private static void EnsureIsPositive(int money)
@@ -43,8 +51,9 @@ public class BankAccount
     public void Withdraw(int money)
     {
         EnsureWithdrawalRulesAreSatisfied(money);
-
-        HandleTransaction(-money);
+        if (IsNotZero(money)) { 
+            HandleTransaction(-money);
+        }
     }
 
     private void EnsureWithdrawalRulesAreSatisfied(int money)
